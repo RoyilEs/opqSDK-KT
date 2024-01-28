@@ -24,59 +24,57 @@ class Group {
     @Resource
     lateinit var other: Other
 
-    @Async
-    @SneakyThrows
-    @EventListener
-    fun logOutput(event: GroupMessageEvent) {
-        if (event.getSender()?.uin == event.getBot()) return
-        val sender = event.getSender()
-        val info = event.getInfo()
-        val messages = event.getMessages()
-        println()
-        MessageLog.info("code: ${event.getMsgInfo()?.msgType.toString()}")
-        MessageLog.info("eventName: ${event.eventName()}")
-        MessageLog.info("群号：${info?.groupCode} - (${info?.groupName}) 群成员：${sender?.uin} - (${sender?.nick})")
-
-        if (messages != null && messages.content?.isNotBlank() == true) MessageLog.info("消息：${messages.content}")
-        if (messages?.images != null) messages.images.stream()
-            .map { "图片链接->: ${it.url}" }
-            .forEach { MessageLog.info(it) }
-        MessageLog.info("消息链: ${event.getMessages()}")
-    }
+//    @Async
+//    @SneakyThrows
+//    @EventListener
+//    fun logOutput(event: GroupMessageEvent) {
+//        if (event.getSender()?.uin == event.getBot()) return
+//        val sender = event.getSender()
+//        val info = event.getInfo()
+//        val messages = event.getMessages()
+//        println()
+//        MessageLog.info("code: ${event.getMsgInfo()?.msgType.toString()}")
+//        MessageLog.info("eventName: ${event.eventName()}")
+//        MessageLog.info("群号：${info?.groupCode} - (${info?.groupName}) 群成员：${sender?.uin} - (${sender?.nick})")
+//
+//        if (messages != null && messages.content?.isNotBlank() == true) MessageLog.info("消息：${messages.content}")
+//        if (messages?.images != null) messages.images.stream()
+//            .map { "图片链接->: ${it.url}" }
+//            .forEach { MessageLog.info(it) }
+//        MessageLog.info("消息链: ${event.getMessages()}")
+//    }
 
     @Async
     @SneakyThrows
     @EventListener
     fun aiQA(event: GroupMessageEvent) {
-        if (event.getMessages()?.atUinLists == null) return
+        if (event.atBot()) {
+            val aliyunAiData = AliyunAiData(
+                model = "qwen-turbo",
+                input = Input(listOf(Message(role = "user", content = event.getTextContent()))),
+                parameters = null
+            )
+            val aliBot = other.AliBot(Gson().toJson(aliyunAiData)) ?: return
+            val nick = event.getSenderNick()
+            val uin = event.getSenderUin()
+            val sendMsg = SendBuiler.sendGroupMsg(
+                event.getGroupUin(),
+                aliBot.output?.text,
+                AtUinLists(nick, uin)
+            )
+            iMainFunc.sendMessage(sendMsg)
+        }
 
-        val bot = event.getMessages()?.atUinLists?.get(0)?.uin
-        if (event.getBot() != bot) return
-
-        val aliyunAiData = AliyunAiData(
-            model = "qwen-turbo",
-            input = Input(listOf(Message(role = "user", content = event.getMessages()?.content))),
-            parameters = null
-        )
-        val aliBot = other.AliBot(Gson().toJson(aliyunAiData)) ?: return
-        val nick = event.getSender()?.nick
-        val uin = event.getSender()?.uin
-        val sendMsg = SendBuiler.sendGroupMsg(
-            event.getInfo()?.groupCode,
-            aliBot.output?.text,
-            AtUinLists(nick, uin)
-        )
-        iMainFunc.sendMessage(sendMsg)
     }
 
     @Async
     @SneakyThrows
     @EventListener
     fun textSend(event: GroupMessageEvent) {
-        val text: String? = event.getMessages()?.content
+        val text: String? = event.getTextContent()
         if (text == "text") {
             val  sendMsg = SendBuiler.sendGroupMsg(
-                event.getInfo()?.groupCode,
+                event.getGroupUin(),
                 "正确的",
             )
             iMainFunc.sendMessage(sendMsg)
