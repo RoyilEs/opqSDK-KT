@@ -9,6 +9,7 @@ import com.roy.opqbot.data.message.eventData.eventHead.MsgInfo
 import com.roy.opqbot.data.message.eventData.eventHead.Sender
 import com.roy.opqbot.data.message.eventData.eventHead.UserInfo
 import com.roy.opqbot.log.MessageLog
+import jdk.jfr.Event
 import lombok.Getter
 import org.springframework.context.ApplicationEvent
 
@@ -71,12 +72,16 @@ class GroupJoinEvent(source: Any?, msgBodyVO: CurrentPacket?) : ApplicationEvent
 }
 
 @Getter
-class FriendMessageEvent(source: Any?, msgBodyVO: CurrentPacket?) : ApplicationEvent(source!!), EventFriendInterface {
+class FriendMessageEvent(source: Any?, msgBodyVO: CurrentPacket?) : ApplicationEvent(source!!), EventFriendMsgInterface {
     private val message: CurrentPacket? = msgBodyVO
     private val eventData: EventData? = message?.currentPacket?.eventData
 
     fun eventName(): String {
         return message?.currentPacket?.eventName.toString()
+    }
+
+    fun getEventData(): EventData? {
+        return eventData
     }
 
     override fun getFriendUin(): Long? {
@@ -91,32 +96,13 @@ class FriendMessageEvent(source: Any?, msgBodyVO: CurrentPacket?) : ApplicationE
         return eventData?.msgHead?.senderUin
     }
 
-    override fun getMessages(): MsgBody? {
+    override fun getTextContent(): String? {
         if (eventData?.msgBody == null) {
             MessageLog.error("非文本消息解析失败")
             return null
         }
-        return eventData.msgBody
+        return eventData.msgBody.content
     }
 
-    override fun getSender(): Sender? {
-        return eventData?.msgHead?.getSenderUser()
-    }
-
-    override fun getInfo(): GroupInfo? {
-        return eventData?.msgHead?.groupInfo
-    }
-
-    override fun getUserInfo(): UserInfo? {
-        return eventData?.msgHead?.getUserInfo()
-    }
-
-    override fun getMsgInfo(): MsgInfo? {
-        return eventData?.msgHead?.getMsgInfo()
-    }
-
-    override fun getBot(): Long? {
-        return message?.currentQQ
-    }
 
 }

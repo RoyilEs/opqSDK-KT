@@ -20,7 +20,7 @@ class Friend {
     @SneakyThrows
     @EventListener
     fun textSend(event: FriendMessageEvent) {
-        val text: String? = event.getMessages()?.content
+        val text: String? = event.getTextContent()
         if (text == "text") {
             val  sendMsg = SendBuiler.sendFriendMsg(
                 event.getFriendUin(),

@@ -16,7 +16,7 @@ import java.util.*
 
 
 object SendBuiler {
-    private const val PBSENDMSG = "MessageSvc.PbSendMsg"
+    private const val PB_SENDMSG = "MessageSvc.PbSendMsg"
     private val query = "QueryUinByUid"
     private val upload = "PicUp.DataUp"
     private val revoke = "GroupRevokeMsg"
@@ -40,7 +40,7 @@ object SendBuiler {
             "Content" to message,
             "AtUinLists" to list
         )
-        return SendTemple(cgiCmd = PBSENDMSG, cgiRequest = data)
+        return SendTemple(cgiCmd = PB_SENDMSG, cgiRequest = data)
     }
 
     /**
@@ -54,7 +54,7 @@ object SendBuiler {
             "ToType" to 2,
             "Content" to message,
         )
-        return SendTemple(cgiCmd = PBSENDMSG, cgiRequest = data)
+        return SendTemple(cgiCmd = PB_SENDMSG, cgiRequest = data)
     }
 
     /**
@@ -69,7 +69,7 @@ object SendBuiler {
             "ToType" to 1,
             "Content" to message
         )
-        return SendTemple(cgiCmd = PBSENDMSG, cgiRequest = data)
+        return SendTemple(cgiCmd = PB_SENDMSG, cgiRequest = data)
     }
 
 
@@ -111,7 +111,7 @@ object SendBuiler {
             msgType to if (msgType == Utils.MsgType.Voice) fileData
             else listOf(fileData)
         )
-        return SendTemple(cgiCmd = PBSENDMSG, cgiRequest = data)
+        return SendTemple(cgiCmd = PB_SENDMSG, cgiRequest = data)
     }
 
 
@@ -238,8 +238,12 @@ object SendBuiler {
      * @param value
      * @return
      */
-    fun MessageEquals(event: GroupMessageEvent, message: Any?): Boolean {
-        if (event.getSender()?.uin == event.getBot()) return false
-        return event.getMessages()?.content.equals(message.toString())
+    fun <T> T.regularProcessing(data: String): String? {
+        return Regex(data).find(this.toString())?.groupValues?.getOrNull(1)
+    }
+
+    fun <T> T.messageEquals(event: GroupMessageEvent): Boolean {
+        if (event.getBot() == event.getSender()?.uin) return false
+        return event.getMessages()?.content!! == this.toString()
     }
 }
