@@ -16,18 +16,14 @@ import java.util.*
 
 
 object SendBuiler {
-    private const val PB_SENDMSG = "MessageSvc.PbSendMsg"
+    private val group = "MessageSvc.PbSendMsg"
     private val query = "QueryUinByUid"
     private val upload = "PicUp.DataUp"
     private val revoke = "GroupRevokeMsg"
     private val openredbag = "OpenREDBAG"
 
     /**
-     * 发送群聊消息结构体
-     *
-     * @param groupCode 群号
-     * @param message 信息体
-     * @param atUinList AT列表
+     * 发送消息结构体
      */
     fun sendGroupMsg(groupCode: Long?, message: Any?, atUinList: AtUinLists?): SendTemple {
 
@@ -40,36 +36,27 @@ object SendBuiler {
             "Content" to message,
             "AtUinLists" to list
         )
-        return SendTemple(cgiCmd = PB_SENDMSG, cgiRequest = data)
+        return SendTemple(cgiCmd = group, cgiRequest = data)
     }
 
-    /**
-     * 发送群聊消息结构体
-     * @param groupCode 群号
-     * @param message 信息体
-     */
     fun sendGroupMsg(groupCode: Long?, message: Any?): SendTemple {
+
         val data = mapOf(
             "ToUin" to groupCode,
             "ToType" to 2,
             "Content" to message,
+            "AtUinLists" to null
         )
-        return SendTemple(cgiCmd = PB_SENDMSG, cgiRequest = data)
+        return SendTemple(cgiCmd = group, cgiRequest = data)
     }
 
-    /**
-     * 发送好友信息结构体
-     *
-     * @param friendUin 好友uin
-     * @param message 信息体
-     */
     fun sendFriendMsg(friendUin: Long?, message: Any?): SendTemple {
         val data = mapOf(
             "ToUin" to friendUin,
             "ToType" to 1,
             "Content" to message
         )
-        return SendTemple(cgiCmd = PB_SENDMSG, cgiRequest = data)
+        return SendTemple(cgiCmd = group, cgiRequest = data)
     }
 
 
@@ -85,11 +72,10 @@ object SendBuiler {
 
     /**
      *  发送文件类型
-     *
+     *  1好友图片2群组图片26好友语音29群组语音
      * @constructor Create empty Upload type
      */
     object UploadType {
-        //        1好友图片2群组图片26好友语音29群组语音
         const val FriendImage = 1
         const val GroupImage = 2
         const val FriendVoice = 26
@@ -104,14 +90,14 @@ object SendBuiler {
      * @see [Image]
      * @return
      */
-    fun sendMsg(groupCode: Long, msgType: String, fileData: Any?): SendTemple {
+    fun sendMsg(groupCode: Long?, msgType: String, fileData: Any?): SendTemple {
         val data = mapOf(
             "ToUin" to groupCode,
             "ToType" to 2,
             msgType to if (msgType == Utils.MsgType.Voice) fileData
             else listOf(fileData)
         )
-        return SendTemple(cgiCmd = PB_SENDMSG, cgiRequest = data)
+        return SendTemple(cgiCmd = group, cgiRequest = data)
     }
 
 
@@ -171,7 +157,6 @@ object SendBuiler {
      * @return
      */
     fun getUidList(queryJson: QueryJson): ResponseData? {
-
         return queryJson.responseData?.map {
             ResponseData(
                 head = it?.head,
@@ -238,12 +223,13 @@ object SendBuiler {
      * @param value
      * @return
      */
+
     fun <T> T.regularProcessing(data: String): String? {
         return Regex(data).find(this.toString())?.groupValues?.getOrNull(1)
     }
 
     fun <T> T.messageEquals(event: GroupMessageEvent): Boolean {
-        if (event.getBot() == event.getSender()?.uin) return false
+        if (event.isFromBot()) return false
         return event.getMessages()?.content!! == this.toString()
     }
 }
