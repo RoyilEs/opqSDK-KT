@@ -96,6 +96,7 @@ class Group {
                 "${uidList?.nick}(${uidList?.uin})退群了，${exitMsg}"
             )
         )
+    }
 
 
 
