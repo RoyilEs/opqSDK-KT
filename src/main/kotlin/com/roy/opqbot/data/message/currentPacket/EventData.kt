@@ -10,16 +10,12 @@ import com.roy.opqbot.data.message.eventData.eventHead.MsgHead
 data class EventData(
     /**
      * 进群事件
-     */
-    @SerializedName("Event")
-    @Expose
-    val eventJoin: EventJoin?, // null
-    /**
      * 退群事件
+     * 邀请事件 Event信息
      */
     @SerializedName("Event")
     @Expose
-    val eventExit: EventExit?, // null
+    val event: Event?, // null
     /**
      * 消息体
      */

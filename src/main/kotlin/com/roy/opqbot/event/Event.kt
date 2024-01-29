@@ -1,9 +1,6 @@
 package com.roy.opqbot.event
 
-import com.roy.opqbot.data.message.currentPacket.CurrentPacket
-import com.roy.opqbot.data.message.currentPacket.EventData
-import com.roy.opqbot.data.message.currentPacket.EventExit
-import com.roy.opqbot.data.message.currentPacket.EventJoin
+import com.roy.opqbot.data.message.currentPacket.*
 import com.roy.opqbot.data.message.eventData.eventBody.AtUinList
 import com.roy.opqbot.data.message.eventData.eventBody.MsgBody
 import com.roy.opqbot.data.message.eventData.eventHead.*
@@ -100,7 +97,8 @@ class GroupJoinEvent(source: Any?, msgBodyVO: CurrentPacket?) : ApplicationEvent
     }
 
     fun getEventJoin(): EventJoin? {
-        return eventData?.eventJoin
+        val event = eventData?.event
+        return event?.let { EventJoin(it) }
     }
 
     override fun isFromInfo(): FromInfo? {
@@ -133,7 +131,8 @@ class GroupExitEvent(source: Any?, msgBodyVO: CurrentPacket?) : ApplicationEvent
     }
 
     fun getEventExit(): EventExit? {
-        return eventData?.eventExit
+        val event = eventData?.event
+        return event?.let { EventExit(it) }
     }
 
     override fun isFromInfo(): FromInfo? {
