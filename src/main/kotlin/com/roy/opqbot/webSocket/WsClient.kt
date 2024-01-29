@@ -5,6 +5,7 @@ import com.roy.opqbot.config.YamlConf
 import com.roy.opqbot.data.message.currentPacket.CurrentPacket
 import com.roy.opqbot.enums.EventNameType
 import com.roy.opqbot.event.FriendMessageEvent
+import com.roy.opqbot.event.GroupExitEvent
 import com.roy.opqbot.event.GroupJoinEvent
 import com.roy.opqbot.event.GroupMessageEvent
 import com.roy.opqbot.log.MessageLog
@@ -67,6 +68,12 @@ class WsClient {
                         )
                         EventNameType.ON_EVENT_GROUP_JOIN -> applicationContext.publishEvent(
                             GroupJoinEvent(
+                                this,
+                                fromJson
+                            )
+                        )
+                        EventNameType.ON_EVENT_GROUP_EXIT -> applicationContext.publishEvent(
+                            GroupExitEvent(
                                 this,
                                 fromJson
                             )

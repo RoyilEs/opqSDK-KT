@@ -16,14 +16,18 @@ import java.util.*
 
 
 object SendBuiler {
-    private val group = "MessageSvc.PbSendMsg"
+    private val pbSend = "MessageSvc.PbSendMsg"
     private val query = "QueryUinByUid"
     private val upload = "PicUp.DataUp"
     private val revoke = "GroupRevokeMsg"
     private val openredbag = "OpenREDBAG"
 
     /**
-     * 发送消息结构体
+     * 发送@At群聊消息结构体
+     * @param groupCode 群号
+     * @param message 消息内容
+     * @param atUinList @see AtUinLists
+     * @return 发送消息的模板
      */
     fun sendGroupMsg(groupCode: Long?, message: Any?, atUinList: AtUinLists?): SendTemple {
 
@@ -36,9 +40,15 @@ object SendBuiler {
             "Content" to message,
             "AtUinLists" to list
         )
-        return SendTemple(cgiCmd = group, cgiRequest = data)
+        return SendTemple(cgiCmd = pbSend, cgiRequest = data)
     }
 
+    /**
+     * 发送群聊消息结构体
+     *  @param groupCode 群号
+     *  @param message 消息内容
+     *  @return 发送消息的模板
+     */
     fun sendGroupMsg(groupCode: Long?, message: Any?): SendTemple {
 
         val data = mapOf(
@@ -47,16 +57,22 @@ object SendBuiler {
             "Content" to message,
             "AtUinLists" to null
         )
-        return SendTemple(cgiCmd = group, cgiRequest = data)
+        return SendTemple(cgiCmd = pbSend, cgiRequest = data)
     }
 
+    /**
+     * 发送好友消息结构体
+     * @param friendUin 好友QQ号
+     * @param message 消息内容
+     * @return 发送消息的模板
+     */
     fun sendFriendMsg(friendUin: Long?, message: Any?): SendTemple {
         val data = mapOf(
             "ToUin" to friendUin,
             "ToType" to 1,
             "Content" to message
         )
-        return SendTemple(cgiCmd = group, cgiRequest = data)
+        return SendTemple(cgiCmd = pbSend, cgiRequest = data)
     }
 
 
@@ -90,14 +106,14 @@ object SendBuiler {
      * @see [Image]
      * @return
      */
-    fun sendMsg(groupCode: Long?, msgType: String, fileData: Any?): SendTemple {
+    fun sendPicMsg(groupCode: Long?, msgType: String, fileData: Any?): SendTemple {
         val data = mapOf(
             "ToUin" to groupCode,
             "ToType" to 2,
             msgType to if (msgType == Utils.MsgType.Voice) fileData
             else listOf(fileData)
         )
-        return SendTemple(cgiCmd = group, cgiRequest = data)
+        return SendTemple(cgiCmd = pbSend, cgiRequest = data)
     }
 
 

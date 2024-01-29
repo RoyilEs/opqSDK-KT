@@ -1,59 +1,44 @@
 package com.roy.opqbot.event
-import com.roy.opqbot.data.message.currentPacket.EventData
 import com.roy.opqbot.data.message.eventData.eventBody.AtUinList
-import com.roy.opqbot.data.message.eventData.eventBody.AtUinLists
-import com.roy.opqbot.data.message.eventData.eventHead.GroupInfo
+import com.roy.opqbot.data.message.eventData.eventBody.MsgBody
+import com.roy.opqbot.data.message.eventData.eventHead.*
 
-interface EventInterface {
-    fun getMessages(): Any?
-    fun getSender(): Any?
-    fun getInfo(): Any?
-    fun getUserInfo(): Any?
-    fun getMsgInfo(): Any?
-    fun getBot(): Any?
-}
-// TODO 未处理FriendPic信息
-interface EventFriendMsgInterface : EventCommonMsgInterface, ITextMsg {
-    fun getFriendUin(): Long?
-    fun getFriendUid(): String?
-    fun getSenderUin(): Long?
-}
-// TODO 未处理GroupPic信息
-interface EventGroupMsgInterface : EventCommonMsgInterface, ITextMsg {
+interface EventGroupMsgInterface : EventCommonMsgTimeInterface, ITextMsg, EventUserInterFace, EventCommonGroup {
     fun atBot(): Boolean
-    fun getAiInfo(): List<AtUinList>?
-    fun getGroupUin(): Long?
+    fun getAtInfo(): List<AtUinList>?
     fun getGroupInfo(): GroupInfo?
-    fun getSenderNick(): String?
-    fun getSenderUid(): String?
-    fun getSenderUin(): Long?
     fun containedPic(): Boolean
     fun containedAt(): Boolean
     fun isFromBot(): Boolean
-
-    //TODO 信息暂处理 红包为谢
-    fun getMessages(): Any?
+    fun getMessages(): MsgBody?
 }
 
+interface EventFriendMsgInterface : EventCommonMsgTimeInterface, ITextMsg, EventUserInterFace {
+    fun getFriendUin(): Long?
+    fun getFriendUid(): String?
+    fun getSenderUin(): Long?
+    fun getMessages(): MsgBody?
+}
+
+interface EventJoinGroupInterface : EventCommonGroup, EventCommonMsgTimeInterface, EventUserInterFace
+
+interface EventExitGroupInterface : EventCommonGroup, EventCommonMsgTimeInterface, EventUserInterFace
+
+interface EventCommonGroup {
+    fun getGroupCode(): Long?
+}
+
+interface EventCommonMsgTimeInterface {
+    fun getMsgTime(): MsgInfo?
+    fun getSenderInfo(): Sender?
+    fun getEventName(): Any?
+}
+
+interface EventUserInterFace {
+    fun isFromInfo(): FromInfo?
+    fun isToInfo(): ToInfo?
+}
 
 interface ITextMsg {
     fun getTextContent(): String?
-}
-
-interface EventCommonMsgInterface {
-    fun getMsgUid(eventData: EventData?): Long? {
-        return eventData?.msgHead?.msgUid
-    }
-    fun getMsgType(eventData: EventData?): Int? {
-        return eventData?.msgHead?.msgType
-    }
-    fun getMsgTime(eventData: EventData?): Long? {
-        return eventData?.msgHead?.msgTime
-    }
-    fun getMsgSeq(eventData: EventData?): Long? {
-        return eventData?.msgHead?.msgSeq
-    }
-    fun getMsgRandom(eventData: EventData?): Long? {
-        return eventData?.msgHead?.msgRandom
-    }
 }

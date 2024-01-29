@@ -10,5 +10,5 @@ interface Other {
         "Authorization: Bearer \${apiKey}", "Content-Type: application/json"
     )
     @Post("https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation")
-    fun AliBot(@Body text: String?): OutText?
+    fun aliBot(@Body text: String?): OutText?
 }

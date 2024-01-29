@@ -28,6 +28,18 @@ data class EventJoin(
     fun getUids(): String {
         return uid.toString()
     }
+}
 
+data class EventExit (
+    @SerializedName("Uid")
+    @Expose
+    val uid: String? // u_NzLC85cSbUHlTJ8X82wVRQ
+) {
+    /**
+     * 谁退出
+     */
+    fun getUids(): String {
+        return uid.toString()
+    }
 
 }

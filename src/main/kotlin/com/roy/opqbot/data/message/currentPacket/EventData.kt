@@ -13,7 +13,13 @@ data class EventData(
      */
     @SerializedName("Event")
     @Expose
-    val event: EventJoin?, // null
+    val eventJoin: EventJoin?, // null
+    /**
+     * 退群事件
+     */
+    @SerializedName("Event")
+    @Expose
+    val eventExit: EventExit?, // null
     /**
      * 消息体
      */
