@@ -24,6 +24,8 @@ interface EventJoinGroupInterface : EventCommonGroup, EventCommonMsgTimeInterfac
 
 interface EventExitGroupInterface : EventCommonGroup, EventCommonMsgTimeInterface, EventUserInterFace
 
+interface EventInviteGroupInterface : EventCommonGroup, EventCommonMsgTimeInterface, EventUserInterFace
+
 interface EventCommonGroup {
     fun getGroupCode(): Long?
 }

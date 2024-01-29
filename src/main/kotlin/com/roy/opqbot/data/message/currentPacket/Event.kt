@@ -21,22 +21,7 @@ data class Event(
     @SerializedName("Tips")
     @Expose
     val tips: String?, //提示信息
-) {
-    /**
-     *  被邀请人Uin 邀请事件
-     */
-    fun getInviteeUin(): String {
-        return  invitee.toString()
-    }
-
-    /**
-     *  邀请人Uin 邀请事件
-     */
-    fun getInvitorUin(): String {
-        return  invitor.toString()
-    }
-}
-
+)
 class EventJoin(event: Event) {
     private val adminUid: String ?= event.adminUid
     private val uid: String ?= event.uid
@@ -70,3 +55,39 @@ class EventExit(event: Event) {
     }
 }
 
+class EventInvite(event: Event) {
+    private val invitee: String? = event.invitee
+    private val invitor: String? = event.invitor
+    private val tips: String? = event.tips
+
+    fun getInviteeUin(): String {
+        return invitee.toString()
+    }
+
+    fun getInvitorUin(): String {
+        return invitor.toString()
+    }
+
+    fun getTips(): Triple<String, String, Pair<String, String>>? {
+        val uinPattern = Regex("uin=\"(.*?)\"")
+        val jpPattern = Regex("jp=\"(.*?)\"")
+
+        // 查找邀请者的信息
+        val inviteUinMatch = tips?.let { uinPattern.find(it, "<qq uin=".length) }
+        val inviteJpMatch = tips?.let { jpPattern.find(it) }
+
+        // 查找被邀请者的信息
+        val joinUinMatch = tips?.let { uinPattern.find(it, "nor txt=\"加入了群聊。\"/><qq uin=".length) }
+        val joinJpMatch = tips?.let { jpPattern.find(it, "nor txt=\"加入了群聊。\"/>".length) }
+
+        return if (inviteUinMatch != null && joinUinMatch != null && inviteJpMatch != null && joinJpMatch != null) {
+            Triple(
+                inviteUinMatch.groupValues[1].removePrefix("u_"),
+                joinUinMatch.groupValues[1].removePrefix("u_"),
+                inviteJpMatch.groupValues[1] to joinJpMatch.groupValues[1]
+            )
+        } else {
+            null
+        }
+    }
+}

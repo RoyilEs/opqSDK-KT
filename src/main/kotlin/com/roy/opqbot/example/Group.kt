@@ -8,6 +8,7 @@ import com.roy.opqbot.data.ai.input.Input
 import com.roy.opqbot.data.ai.input.Message
 import com.roy.opqbot.data.message.eventData.eventBody.AtUinLists
 import com.roy.opqbot.event.GroupExitEvent
+import com.roy.opqbot.event.GroupInviteEvent
 import com.roy.opqbot.event.GroupJoinEvent
 import com.roy.opqbot.event.GroupMessageEvent
 import com.roy.opqbot.log.MessageLog
@@ -64,8 +65,30 @@ class Group {
         iMainFunc.sendMessage(
             SendBuiler.sendGroupMsg(
                 groupCode,
-                "欢迎${uidList?.nick}新朋友~\n" +
+                "欢迎${uidList?.nick}(-${uidList?.uin}-)新朋友~\n" +
                         "本群使用AI自动回复，请勿在群内发送敏感信息，违者将被踢出群聊！\n"+
+                        "来了就不准跑哦!"
+            )
+        )
+    }
+
+    /**
+     * 邀请进群公告
+     */
+    @Async
+    @SneakyThrows
+    @EventListener
+    fun addGroupTips(event: GroupInviteEvent) {
+        val groupCode = event.getGroupCode()
+        //被邀请人
+        val inviteeUin = event.getEventInvite()?.getInviteeUin()
+        //邀请人
+        val invitorUin = event.getEventInvite()?.getInvitorUin()
+        iMainFunc.sendMessage(
+            SendBuiler.sendGroupMsg(
+                groupCode,
+                "(-${invitorUin}-)\n邀请\n" +
+                        "(-${inviteeUin}-)\n进入本群\n"+
                         "来了就不准跑哦!"
             )
         )
@@ -93,7 +116,7 @@ class Group {
         iMainFunc.sendMessage(
             SendBuiler.sendGroupMsg(
                 groupCode,
-                "${uidList?.nick}(${uidList?.uin})退群了，${exitMsg}"
+                "${uidList?.nick}(-${uidList?.uin}-)退群了，${exitMsg}"
             )
         )
     }

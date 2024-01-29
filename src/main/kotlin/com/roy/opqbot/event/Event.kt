@@ -144,8 +144,40 @@ class GroupExitEvent(source: Any?, msgBodyVO: CurrentPacket?) : ApplicationEvent
     }
 }
 
+class GroupInviteEvent(source: Any?, msgBodyVO: CurrentPacket?) : ApplicationEvent(source!!),
+    EventInviteGroupInterface {
+    private val message: CurrentPacket? = msgBodyVO
+    private val eventData: EventData? = message?.currentPacket?.eventData
+    override fun getGroupCode(): Long? {
+        return isFromInfo()?.fromUin
+    }
 
+    override fun getMsgTime(): MsgInfo? {
+        return eventData!!.msgHead?.getMsgInfo()
+    }
 
+    override fun getSenderInfo(): Sender? {
+        return eventData?.msgHead?.getSenderUser()
+    }
+
+    override fun getEventName(): Any? {
+        return message!!.currentPacket?.eventName
+    }
+
+    fun getEventInvite(): EventInvite? {
+        val event = eventData?.event
+        return event?.let { EventInvite(it) }
+    }
+
+    override fun isFromInfo(): FromInfo? {
+        return eventData!!.msgHead?.getFromInfo()
+    }
+
+    override fun isToInfo(): ToInfo? {
+        return eventData!!.msgHead?.getToInfo()
+    }
+
+}
 @Getter
 class FriendMessageEvent(source: Any?, msgBodyVO: CurrentPacket?): ApplicationEvent(source!!),
     EventFriendMsgInterface {
